@@ -16,7 +16,7 @@
     "coffee-script": "1.6.3",
     "consolidate": "0.10.0",
     "jade": "0.35.0",
-    "github": "~0.1.12",
+    "github": "https://github.com/dhm116/node-github",
     "mocha": "~1.17.0",
     "chai": "~1.8.1",
     "q": "~1.0.0",
