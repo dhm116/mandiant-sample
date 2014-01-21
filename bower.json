@@ -1,0 +1,11 @@
+{
+  "name": "appname",
+  "version": "0.1.0",
+  "dependencies": {
+    "jquery": "2.0.3",
+    "requirejs": "2.1.8",
+    "chai": "~1.8.1",
+    "bootstrap": "~3.0.3",
+    "font-awesome": "~4.0.3"
+  }
+}

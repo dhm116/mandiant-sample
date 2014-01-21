@@ -1,0 +1,62 @@
+extends layout
+
+block content
+  .container
+    .row
+      .col-md-12
+        if author != null
+          h2
+            a(href='/') joyent/node
+            span= '/' + author
+        else
+          h2 joyent/node
+    .row
+      .col-md-8
+        .panel.panel-default
+          .panel-heading
+            h3.panel-title Commit History
+              small.pull-right Last
+                span.pad-left
+                  .badge.badge-info= commits.length
+          .panel-body
+            table.table
+              thead
+              tfoot
+              tbody
+                each commit in commits
+                  - var highlight = !isNaN(parseInt(commit.sha.substring(commit.sha.length-1, commit.sha.length), 10))
+                  if highlight == true
+                    tr.commit.highlight
+                      +commitData(commit)
+                  else
+                    tr.commit
+                      +commitData(commit)
+      .col-md-4
+        .panel.panel-default
+          .panel-heading
+            h3.panel-title Contributers
+              small.pull-right
+                .badge.badge-info= contributors.length
+          .panel-body
+            ul.nav.nav-pills.nav-stacked
+              each contributor in contributors
+                li
+                  a(href= '/' + contributor.login)
+                    img.img-thumbnail(src= contributor.avatar_url, width=40)
+                    span.pad-left= contributor.login
+
+mixin commitData(commit)
+  td
+    img.img-thumbnail(src= commit.author.avatar_url, width=40)
+  td
+    h5= commit.commit.message.substring(0, 45)
+    .authorship
+      a(href= '/' + commit.author.login)= commit.author.login
+      span.pad-left authored
+      span.pad-left= moment(commit.commit.author.date).fromNow()
+  td
+    a(href= 'http://github.com/joyent/node/commit/' + commit.sha)
+      span= commit.sha.substring(0,10)
+      span ...
+      span= commit.sha.substring(commit.sha.length - 4, commit.sha.length)
+      i.pad-left.fa.fa-arrow-circle-right

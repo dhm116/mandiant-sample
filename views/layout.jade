@@ -1,0 +1,22 @@
+doctype 5
+html
+  head
+    title Mimosa
+    link(rel='stylesheet', href='/stylesheets/vendor/bootstrap/bootstrap.css' + cachebust)
+    link(rel='stylesheet', href='/stylesheets/vendor/font-awesome/font-awesome.css' + cachebust)
+    link(rel='stylesheet', href='/stylesheets/style.css' + cachebust)
+
+    if reload
+      script(src='/socket.io/socket.io.js')
+      script(src='/javascripts/reload-client.js')
+
+    script(src='/javascripts/vendor/jquery/jquery.js')
+    script(src='/javascripts/vendor/bootstrap/bootstrap.js')
+
+    if optimize
+      script(src='/javascripts/main-built.js')
+    else
+      script(src='/javascripts/vendor/requirejs/require.js', data-main='/javascripts/main.js')
+
+  body
+    block content
