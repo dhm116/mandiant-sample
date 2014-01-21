@@ -4,6 +4,7 @@ engines = require 'consolidate'
 Github = require 'github'
 Q = require 'q'
 
+# Boilerplate mimosa app template
 exports.startServer = (config, callback) ->
 
   port = process.env.PORT or config.server.port
@@ -30,49 +31,31 @@ exports.startServer = (config, callback) ->
   app.configure 'development', ->
     app.use express.errorHandler()
 
+  # Move logic from routes/index.coffee for simplicity
   options =
     reload:    config.liveReload.enabled
     optimize:  config.isOptimize ? false
     cachebust: if process.env.NODE_ENV isnt "production" then "?b=#{(new Date()).getTime()}" else ''
 
+  # Github API reference
   gh = new Github {
       version: '3.0.0'
       timeout: 5000
   }
 
-  commitCache = []
-  contributorCache = []
-
   getCommits = (author) ->
     d = Q.defer()
 
-    unless commitCache.length > 0 and author is null
-      query = {user:'joyent',repo:'node'}
-      if author
-        query.author = author
-        query.per_page = 20
-        console.log "Filtering on author = #{author}"
-      gh.repos.getCommits query, (err, commits) ->
-        if err
-          console.warn(err)
-        else
-          commitCache = commits
-          d.resolve(commits)
-    else
-      d.resolve(commitCache)
+    query = {user:'joyent',repo:'node'}
+    if author
+      query.author = author
+      console.log "Filtering on author = #{author}"
 
-    return d.promise
-
-  getContributors = ->
-    d = Q.defer()
-    unless contributorCache.length > 0
-      gh.repos.getContributors {user:'joyent',repo:'node'}, (err, contributors) ->
-        if err
-        else
-          contributorCache = contributors
-          d.resolve(contributors)
-    else
-      d.resolve(contributorCache)
+    gh.repos.getCommits query, (err, commits) ->
+      if err
+        console.warn(err)
+      else
+        d.resolve(commits)
 
     return d.promise
 
@@ -86,10 +69,10 @@ exports.startServer = (config, callback) ->
 
     author = if req.params.author then req.params.author else null
 
-    Q.all([getCommits(author), getContributors()]).spread (commits, contributors) ->
+    getCommits(author).then (commits) ->
       options.commits = commits
-      options.contributors = contributors
       options.author = author
+
       res.render name, options
 
   callback(server)
