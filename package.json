@@ -23,6 +23,7 @@
     "moment": "~2.5.0",
     "mimosa-jasmine-node": "dhm116/mimosa-jasmine-node",
     "request": "~2.33.0",
-    "zombie": "~2.0.0-alpha24"
+    "zombie": "~2.0.0-alpha24",
+    "logmimosa": "~0.6.0"
   }
 }
