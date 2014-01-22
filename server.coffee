@@ -26,6 +26,7 @@ exports.startServer = (config, callback) ->
     app.use config.server.base, app.router
     app.use express.static(config.watch.compiledDir)
 
+    # Expose moment.js to the Jade template engine
     app.locals.moment = require('moment')
 
   app.configure 'development', ->
@@ -43,23 +44,34 @@ exports.startServer = (config, callback) ->
       timeout: 5000
   }
 
+  # Wrap our github api call in a promise
   getCommits = (author) ->
     d = Q.defer()
 
+    # Default repo parameters
     query = {user:'joyent',repo:'node'}
+
+    # Check if an author has been specified
     if author
       query.author = author
       console.log "Filtering on author = #{author}"
 
+    # Load the commit history for this repo
     gh.repos.getCommits query, (err, commits) ->
       if err
+        # TODO should fail a little more gracefully here
         console.warn(err)
       else
+        # Got our results, complete the promise
         d.resolve(commits)
 
+    # Return the promise
     return d.promise
 
-  app.get '/:author?', (req, res) -> #routes.index(config)
+  # Main index route
+  #
+  # author is an optional argument
+  app.get '/:author?', (req, res) ->
     # In the event plain html pages are being used, need to
     # switch to different page for optimized view
     name = if config.isOptimize and config.server.views.html
@@ -67,12 +79,17 @@ exports.startServer = (config, callback) ->
     else
       "index"
 
+    # Pull out the author from the URL path if it was specified
     author = if req.params.author then req.params.author else null
 
+    # Load the commit history
     getCommits(author).then (commits) ->
+      # Supply the commit history to the template
       options.commits = commits
+      # Supply the author to the template
       options.author = author
 
+      # Render the view
       res.render name, options
 
   callback(server)
